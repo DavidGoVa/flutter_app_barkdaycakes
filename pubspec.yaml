@@ -60,6 +60,8 @@ flutter:
     - public/img/filter1/salmonatun.png
     - public/img/filter1/temporada.png
     - public/img/filter1/tocinocamote.png
+    - public/img/filter1/letrero.png
+    - public/img/filter1/vestimenta.jpg
     - public/img/filter2/micro.png
     - public/img/filter2/mini.png
     - public/img/filter2/chico.png

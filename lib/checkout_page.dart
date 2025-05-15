@@ -1,9 +1,11 @@
+import 'package:barkdaycakes_app/tracker_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:barkdaycakes_app/models/cart.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripeF;
+import 'package:url_launcher/url_launcher.dart';
 
 class CheckoutPage extends StatefulWidget {
   @override
@@ -113,67 +115,75 @@ class _CheckoutPageState extends State<CheckoutPage> {
               onChanged: (val) => setState(() => metodoEntrega = val!),
             ),
 
-            // Sucursal (solo si es recoger en tienda)
-            if (metodoEntrega == "Recoger en tienda") ...[
-              const SizedBox(height: 20),
-              Text("3. SELECCIONA SUCURSAL", style: sectionTitleStyle),
-              DropdownButtonFormField<String>(
-                value: sucursal,
+            const SizedBox(height: 20),
+            Text("3. SELECCIONA SUCURSAL", style: sectionTitleStyle),
+            DropdownButtonFormField<String>(
+              value: sucursal,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
+              items:
+                  ["Anzures", "Condesa"]
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+              onChanged: (val) => setState(() => sucursal = val!),
+            ),
+
+            const SizedBox(height: 20),
+            Text("4. FECHA DE RECOLECCIÓN", style: sectionTitleStyle),
+            InkWell(
+              onTap: () async {
+                final selectedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now().add(Duration(days: 1)),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(Duration(days: 365)),
+                );
+
+                if (selectedDate != null) {
+                  final selectedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay(hour: 12, minute: 0),
+                  );
+
+                  if (selectedTime != null) {
+                    setState(() {
+                      fechaRecoleccion = DateTime(
+                        selectedDate.year,
+                        selectedDate.month,
+                        selectedDate.day,
+                        selectedTime.hour,
+                        selectedTime.minute,
+                      );
+                    });
+                  }
+                }
+              },
+              child: InputDecorator(
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 8,
+                    vertical: 16,
                   ),
                 ),
-                items:
-                    ["Anzures", "Condesa"]
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                onChanged: (val) => setState(() => sucursal = val!),
-              ),
-            ],
-
-            // Fecha de recolección
-            if (metodoEntrega == "Recoger en tienda") ...[
-              const SizedBox(height: 20),
-              Text("4. FECHA DE RECOLECCIÓN", style: sectionTitleStyle),
-              InkWell(
-                onTap: () async {
-                  final selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now().add(Duration(days: 1)),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
-                  );
-                  if (selectedDate != null) {
-                    setState(() {
-                      fechaRecoleccion = selectedDate;
-                    });
-                  }
-                },
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      fechaRecoleccion != null
+                          ? "${fechaRecoleccion!.day}/${fechaRecoleccion!.month}/${fechaRecoleccion!.year} ${fechaRecoleccion!.hour.toString().padLeft(2, '0')}:${fechaRecoleccion!.minute.toString().padLeft(2, '0')}"
+                          : "Selecciona fecha y hora",
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        fechaRecoleccion != null
-                            ? "${fechaRecoleccion!.day}/${fechaRecoleccion!.month}/${fechaRecoleccion!.year}"
-                            : "Selecciona una fecha",
-                      ),
-                      Icon(Icons.calendar_today),
-                    ],
-                  ),
+                    Icon(Icons.calendar_today),
+                  ],
                 ),
               ),
-            ],
+            ),
 
             // Datos del cliente
             const SizedBox(height: 20),
@@ -211,26 +221,46 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
 
             // Mapa de ubicación
-            if (metodoEntrega == "Recoger en tienda") ...[
-              const SizedBox(height: 20),
-              Text("UBICACIÓN DE LA SUCURSAL", style: sectionTitleStyle),
-              const SizedBox(height: 8),
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
+            const SizedBox(height: 20),
+            Text("UBICACIÓN DE LA SUCURSAL", style: sectionTitleStyle),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 20,
+                ),
+                backgroundColor: Colors.grey[200],
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                      sucursal == "Anzures"
-                          ? "https://maps.googleapis.com/maps/api/staticmap?center=Calle+Bahia+de+Sta.+Bárbara+116,CDMX&zoom=15&size=600x300&markers=color:red%7CCalle+Bahia+de+Sta.+Bárbara+116,CDMX"
-                          : "https://maps.googleapis.com/maps/api/staticmap?center=Av.+Sonora+147,CDMX&zoom=15&size=600x300&markers=color:blue%7CAv.+Sonora+147,CDMX",
-                    ),
-                  ),
                 ),
               ),
-            ],
+              onPressed: () async {
+                final url =
+                    sucursal == "Anzures"
+                        ? Uri.parse(
+                          "https://www.google.com/maps/search/?api=1&query=Calle+Bahia+de+Sta.+Bárbara+116,+CDMX",
+                        )
+                        : Uri.parse(
+                          "https://www.google.com/maps/search/?api=1&query=Av.+Sonora+147,+CDMX",
+                        );
+
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                } else {
+                  // Manejar error
+                  debugPrint("No se pudo abrir el enlace");
+                }
+              },
+              icon: const Icon(Icons.location_on, color: Colors.red),
+              label: Text(
+                sucursal == "Anzures"
+                    ? "Ver ubicación en Maps\nCalle Bahía de Sta. Bárbara 116, CDMX"
+                    : "Ver ubicación en Maps\nAv. Sonora 147, CDMX",
+                textAlign: TextAlign.left,
+                style: const TextStyle(color: Colors.black87),
+              ),
+            ),
 
             // Botón de pago
             const SizedBox(height: 30),
@@ -303,16 +333,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
       final orderResponse = await _registrarOrdenEnAPI(context);
 
       // 5. Confirmar al usuario y limpiar el carrito
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Pago exitoso. Orden registrada (#${orderResponse['order_id']})',
-          ),
-        ),
-      );
+      final sellId = orderResponse['sell_id'].toString();
 
       Provider.of<Cart>(context, listen: false).clearCart();
-      Navigator.popUntil(context, ModalRoute.withName('/menu'));
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TrackerPage(sellId: sellId)),
+      );
     } on stripeF.StripeException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -336,11 +364,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final cart = Provider.of<Cart>(context, listen: false);
 
     // Prepara la nota con los detalles de recolección
-    String sellNote = "Método de entrega: $metodoEntrega\n";
-    if (metodoEntrega == "Recoger en tienda") {
-      sellNote += "Sucursal: $sucursal\n";
-      sellNote +=
-          "Fecha de recolección: ${fechaRecoleccion!.toLocal().toString()}";
+    String sellNote = "🧁 Orden de $nombreCliente ($telefonoCliente)\n";
+    sellNote += "📦 Método: $metodoEntrega\n";
+    sellNote += "🏪 Entrega en: $sucursal\n";
+
+    // Asumiendo que tienes una lista `cart.items`
+    for (var item in cart.items) {
+      if (item['extraData'] != null && item['extraData'].isNotEmpty) {
+        sellNote += "\n Especificaciones:\n";
+        item['extraData'].forEach((k, v) {
+          sellNote += "  • $k: $v\n";
+        });
+      }
     }
 
     // Prepara los items en el formato requerido
@@ -358,7 +393,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       "sell_seller": "jgome329",
       "sell_status": "Ordenado",
       "sell_amount": cart.totalPrice.toString(),
-      "selled_through": "app",
+      "selled_through": "APP",
       "selled_to": 57,
       "selled_at_branch":
           sucursal == "Anzures"

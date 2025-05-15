@@ -59,7 +59,7 @@ class Filter1Page extends StatelessWidget {
     'temporada': 'public/img/filter1/temporada.png',
     /*pendiente*/
     'tocino camote': 'public/img/filter1/tocinocamote.png',
-    'vestimenta': 'public/img/filter1/vestimenta.png' /*pendiente*/,
+    'vestimenta': 'public/img/filter1/vestimenta.jpg' /*pendiente*/,
   };
 
   // Orden deseado de las categorías

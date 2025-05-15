@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class TrackerPage extends StatefulWidget {
+  final String? sellId;
+  TrackerPage({this.sellId});
   @override
   _TrackerPageState createState() => _TrackerPageState();
 }
@@ -12,6 +14,15 @@ class _TrackerPageState extends State<TrackerPage> {
   Map<String, dynamic>? _pedidoData;
   bool _loading = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.sellId != null && widget.sellId!.isNotEmpty) {
+      _ticketController.text = widget.sellId!;
+      _buscarPedido();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
