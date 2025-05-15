@@ -1,0 +1,88 @@
+name: barkdaycakes_app
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  #google_sign_in: ^6.0.1
+  flutter_stripe: ^10.0.0
+  #flutter_braintree: ^2.0.0
+  provider: ^6.0.0
+  url_launcher: ^6.2.5
+  video_player: ^2.7.0
+  http: ^1.3.0
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - public/img/barkdaycakeslogo.png
+    - public/img/homescreenimage.png
+    - public/img/pasteles.png
+    - public/img/categories/pastel.png
+    - public/img/categories/brownie.png
+    - public/img/categories/cupcake.png
+    - public/img/categories/treat.png
+    - public/img/categories/articulo.png
+    - public/img/categories/paquete.png
+    - public/img/pastelcompleta.jpg
+    - public/img/brownies.png
+    - public/img/treats.png
+    - public/img/cupcakes.png
+    - public/img/cupcakescompleta.jpg
+    - public/img/otros.png
+    - public/img/filter1/bandana.jpeg
+    - public/img/filter1/globo.jpeg
+    - public/img/filter1/gorrito.jpeg
+    - public/img/filter1/higadoavena.png
+    - public/img/filter1/hogar.png
+    - public/img/filter1/juguete.png
+    - public/img/filter1/manzanazanahoria.png
+    - public/img/filter1/meatloaf.png
+    - public/img/filter1/pastelcupcake.png
+    - public/img/filter1/pavobetabel.png
+    - public/img/filter1/platano.png
+    - public/img/filter1/salmonatun.png
+    - public/img/filter1/temporada.png
+    - public/img/filter1/tocinocamote.png
+    - public/img/filter2/micro.png
+    - public/img/filter2/mini.png
+    - public/img/filter2/chico.png
+    - public/img/filter2/mediano.png
+    - public/img/filter2/grande.png
+    - public/img/filter2/xg.png
+    - public/img/default.jpg
+    - public/img/pastelmodels/attire.jpg
+    - public/img/pastelmodels/carlota.jpg
+    - public/img/pastelmodels/clasico.jpg
+    - public/img/pastelmodels/clasicohuella.jpg
+    - public/img/pastelmodels/coat.jpg
+    - public/img/pastelmodels/coatcorazon.jpg
+    - public/img/pastelmodels/fiore.jpg
+    - public/img/pastelmodels/huellitas3d.jpg
+    - public/img/pastelmodels/huesitos.jpg
+    - public/img/pastelmodels/kala.jpg
+    - public/img/pastelmodels/naked.jpg
+    - public/img/pastelmodels/pia.jpg
+    - public/img/pastelmodels/playball.jpg
+    - public/img/pastelmodels/rockstar.jpg
+    - public/img/pastelmodels/romualda.jpg
+    - public/img/pastelmodels/vida.jpg
+
+
+ 
