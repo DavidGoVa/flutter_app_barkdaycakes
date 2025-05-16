@@ -5,6 +5,7 @@ import 'package:barkdaycakes_app/producto_detalle_page.dart';
 import 'package:barkdaycakes_app/providers/productos_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:video_player/video_player.dart';
 /*import 'package:google_sign_in/google_sign_in.dart';*/
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
@@ -113,23 +114,31 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
+  late AnimationController _animationController;
+  late VideoPlayerController _videoController;
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
+    _animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 1),
       lowerBound: 0.9,
       upperBound: 1.1,
     )..repeat(reverse: true);
 
+    _videoController = VideoPlayerController.asset(
+        'public/videos/homescreenvideo.mp4',
+      )
+      ..initialize().then((_) {
+        _videoController.setLooping(true);
+        _videoController.play(); // Comienza a reproducir automáticamente
+        setState(() {}); // Actualiza la UI cuando el video esté listo
+      });
     _cargarProductos(); // Cargar los productos
 
     Future.delayed(Duration(seconds: 3), () {
-      _controller.stop();
+      _animationController.stop();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -151,7 +160,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _animationController.dispose();
+    _videoController.dispose();
     super.dispose();
   }
 
@@ -161,7 +171,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: Color(0xFFF6AAAE),
       body: Center(
         child: ScaleTransition(
-          scale: _controller,
+          scale: _animationController,
           child: Image.asset('public/img/barkdaycakeslogo.png', width: 200),
         ),
       ),
@@ -169,13 +179,39 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late VideoPlayerController _videoController;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoController = VideoPlayerController.asset(
+        'public/videos/homescreenvideo.mp4',
+      )
+      ..initialize().then((_) {
+        _videoController.setLooping(true);
+        _videoController.play();
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFFF6AAAE),
-        centerTitle: true, // Esto es clave
+        centerTitle: true,
         title: Image.asset('public/img/barkdaycakeslogo.png', width: 100),
       ),
       drawer: Drawer(
@@ -210,7 +246,6 @@ class HomeScreen extends StatelessWidget {
               _buildDrawerItem(context, 'TRACKER', routeName: "/tracker"),
               _buildDrawerItem(context, 'BARK PROFILE', routeName: "/profile"),
               Divider(color: Colors.white24),
-
               _buildDrawerItem(
                 context,
                 'Servicio al cliente',
@@ -237,7 +272,15 @@ class HomeScreen extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset('public/img/homescreenimage.png', fit: BoxFit.cover),
+          // Reemplazamos la imagen con el video
+          if (_videoController.value.isInitialized)
+            AspectRatio(
+              aspectRatio: _videoController.value.aspectRatio,
+              child: VideoPlayer(_videoController),
+            )
+          else
+            Center(child: CircularProgressIndicator()),
+
           Column(
             children: [
               Expanded(child: Container()), // Espacio arriba (2/3)

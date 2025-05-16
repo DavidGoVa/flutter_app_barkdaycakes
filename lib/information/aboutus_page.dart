@@ -1,3 +1,4 @@
+/*LIBRERIAS A OCUPAR*/
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,7 +18,7 @@ class AboutUsPage extends StatelessWidget {
             children: [
               Center(
                 child: Image.asset(
-                  'public/img/barkdaycakeslogo.png', // asegúrate de tener este logo en tus assets
+                  'public/img/barkdaycakeslogo.png',
                   height: 120,
                 ),
               ),

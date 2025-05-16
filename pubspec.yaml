@@ -31,6 +31,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - public/videos/homescreenvideo.mp4
     - public/img/barkdaycakeslogo.png
     - public/img/homescreenimage.png
     - public/img/pasteles.png
